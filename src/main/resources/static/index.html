@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a5f, #2e75b6);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 { font-size: 24px; }
+        header p { font-size: 13px; opacity: 0.8; }
+
+        .badge {
+            background: #28a745;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: auto;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2e75b6;
+        }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #1e3a5f;
+            margin-bottom: 20px;
+            font-size: 18px;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #1e3a5f;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 14px;
+            color: #333;
+        }
+
+        tr:hover td { background: #f8f9ff; }
+
+        .course-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .devops { background: #e3f2fd; color: #1565c0; }
+        .java { background: #fff3e0; color: #e65100; }
+        .python { background: #e8f5e9; color: #2e7d32; }
+        .cloud { background: #f3e5f5; color: #6a1b9a; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #dc3545;
+            background: #fff5f5;
+            border-radius: 8px;
+        }
+
+        .refresh-btn {
+            background: #2e75b6;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+            font-size: 13px;
+        }
+
+        .refresh-btn:hover { background: #1e3a5f; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>🎓 Student Management System</h1>
+        <p>Real MNC Practice Project — DevOps Engineer</p>
+    </div>
+    <span class="badge">● Service Running</span>
+</header>
+
+<div class="container">
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="number" id="totalStudents">-</div>
+            <div class="label">Total Students</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" id="totalCourses">-</div>
+            <div class="label">Unique Courses</div>
+        </div>
+        <div class="stat-card">
+            <div class="number">8081</div>
+            <div class="label">Service Port</div>
+        </div>
+    </div>
+
+    <!-- Students Table -->
+    <div class="card">
+        <h2>
+            📋 Students List
+            <button class="refresh-btn" onclick="loadStudents()">🔄 Refresh</button>
+        </h2>
+        <div id="tableContainer">
+            <div class="loading">Loading students...</div>
+        </div>
+    </div>
+
+    <!-- Service Info -->
+    <div class="card">
+        <h2>🔧 Service Information</h2>
+        <table>
+            <tr>
+                <td><strong>Service Name</strong></td>
+                <td>student-service</td>
+            </tr>
+            <tr>
+                <td><strong>API Endpoint</strong></td>
+                <td>/students</td>
+            </tr>
+            <tr>
+                <td><strong>Health Check</strong></td>
+                <td>/actuator/health</td>
+            </tr>
+            <tr>
+                <td><strong>Database</strong></td>
+                <td>H2 In-Memory</td>
+            </tr>
+            <tr>
+                <td><strong>H2 Console</strong></td>
+                <td><a href="/h2-console" target="_blank">/h2-console</a></td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    function getCourseClass(course) {
+        const map = {
+            'DevOps': 'devops',
+            'Java': 'java',
+            'Python': 'python',
+            'Cloud': 'cloud'
+        };
+        return map[course] || 'devops';
+    }
+
+    function loadStudents() {
+        document.getElementById('tableContainer').innerHTML =
+            '<div class="loading">Loading...</div>';
+
+        fetch('/students')
+            .then(res => res.json())
+            .then(students => {
+                // Update stats
+                document.getElementById('totalStudents').textContent = students.length;
+                const courses = [...new Set(students.map(s => s.course))];
+                document.getElementById('totalCourses').textContent = courses.length;
+
+                // Build table
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Course</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                students.forEach(s => {
+                    html += `
+                        <tr>
+                            <td>${s.id}</td>
+                            <td>${s.name}</td>
+                            <td>${s.email}</td>
+                            <td>
+                                <span class="course-badge ${getCourseClass(s.course)}">
+                                    ${s.course}
+                                </span>
+                            </td>
+                        </tr>`;
+                });
+
+                html += `</tbody></table>`;
+                document.getElementById('tableContainer').innerHTML = html;
+            })
+            .catch(err => {
+                document.getElementById('tableContainer').innerHTML =
+                    '<div class="error">❌ Error loading students! Check service.</div>';
+            });
+    }
+
+    // Auto load on page open
+    loadStudents();
+</script>
+
+</body>
+</html>
