@@ -1,0 +1,12 @@
+.git
+.gitignore
+.idea
+*.iml
+.vscode
+target/
+.DS_Store
+Thumbs.db
+Dockerfile
+.dockerignore
+*.md
+src/test/
