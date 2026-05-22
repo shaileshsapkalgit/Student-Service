@@ -136,11 +136,23 @@ jobs:
             --create-namespace \
             --set image.tag=$IMAGE_TAG \
             --set image.repository=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/devops-portfolio/student-service \
-            --wait \
-            --timeout 5m
+            --timeout 10m
+
+      - name: Wait for Deployment
+        run: |
+          kubectl rollout status deployment/student-service -n dev --timeout=10m
+
+      - name: Debug Pod Status
+        if: always()
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -n dev
+          echo "=== Events ==="
+          kubectl get events -n dev --sort-by='.lastTimestamp'
+          echo "=== Logs ==="
+          kubectl logs -n dev -l app.kubernetes.io/name=student-service --tail=30 || true
 
       - name: Verify Deployment
         run: |
-          kubectl rollout status deployment/student-service -n dev
           kubectl get pods -n dev
           echo "✅ Student-Service Deployed Successfully!"
