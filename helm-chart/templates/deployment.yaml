@@ -15,6 +15,18 @@ spec:
         {{- include "helm-chart.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - {{ .Chart.Name }}
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: student-service
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -26,6 +38,8 @@ spec:
               value: {{ .Values.env.SPRING_PROFILES_ACTIVE | quote }}
             - name: JAVA_OPTS
               value: {{ .Values.env.JAVA_OPTS | quote }}
+            - name: STUDENT_SERVICE_URL
+              value: {{ .Values.env.STUDENT_SERVICE_URL | quote }}
           livenessProbe:
             httpGet:
               path: {{ .Values.livenessProbe.httpGet.path }}
