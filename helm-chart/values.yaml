@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: 334044476918.dkr.ecr.us-east-1.amazonaws.com/devops-portfolio/student-service
+  repository: 836095228526.dkr.ecr.us-east-1.amazonaws.com/devops-portfolio/student-service
   pullPolicy: IfNotPresent
   tag: "latest"
 
@@ -17,7 +17,16 @@ service:
   targetPort: 8081
 
 ingress:
-  enabled: false
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  hosts:
+    - host: ""
+      paths:
+        - path: /student(/|$)(.*)
+          pathType: Prefix
+  tls: []
 
 resources:
   requests:
