@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: 836095228526.dkr.ecr.us-east-1.amazonaws.com/devops-portfolio/student-service
+  repository: 361697161922.dkr.ecr.us-east-1.amazonaws.com/devops-portfolio/student-service
   pullPolicy: IfNotPresent
   tag: "latest"
 

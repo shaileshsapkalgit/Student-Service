@@ -13,3 +13,4 @@ spec:
       command: ['wget']
       args: ['{{ include "helm-chart.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
+
